@@ -179,20 +179,6 @@ Welcome to submit Issues and Pull Requests to improve the project.
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-### License Summary
-- ✅ Commercial use
-- ✅ Modification
-- ✅ Distribution
-- ✅ Private use
-- ❌ Liability limitation
-- ❌ Warranty
-
-## 📞 Support
-
-If you have questions or suggestions, please contact us through:
-- Submit GitHub Issues
-- Send email feedback
-
 ---
 
 **Note**: Please ensure all required API keys and authentication information are properly configured before use. For detailed configuration steps, please refer to [SETUP.md](SETUP.md).
