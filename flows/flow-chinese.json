@@ -1,0 +1,514 @@
+[
+    {
+        "id": "eee4d6c3c137bc07",
+        "type": "tab",
+        "label": "ChineseVersion",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "0b77d9a9b20742b9",
+        "type": "e-mail in",
+        "z": "eee4d6c3c137bc07",
+        "name": "IMAP监听邮件",
+        "protocol": "IMAP",
+        "server": "imap.gmail.com",
+        "useSSL": true,
+        "autotls": "never",
+        "port": "993",
+        "authtype": "BASIC",
+        "saslformat": false,
+        "token": "YOUR_OAUTH_ACCESS_TOKEN_HERE",
+        "box": "INBOX",
+        "disposition": "Read",
+        "criteria": "UNSEEN",
+        "repeat": "30",
+        "fetch": "auto",
+        "inputs": 0,
+        "x": 430,
+        "y": 480,
+        "wires": [
+            [
+                "3fd55876cde28b6d"
+            ]
+        ]
+    },
+    {
+        "id": "3fd55876cde28b6d",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "处理邮件内容",
+        "func": "// 提取邮件关键信息\nconst emailData = {\n    from: msg.from || '未知发件人',\n    to: msg.to || '未知收件人', \n    subject: msg.subject || '无主题',\n    text: msg.text || msg.payload || '无内容',\n    date: msg.date || new Date().toISOString(),\n    messageId: msg.messageId || 'unknown'\n};\n\n// 构建给DeepSeek的提示词，强调当前邮件优先级\nconst prompt = `请分析以下邮件，重点关注最新发送的内容，历史往来仅作为理解上下文的参考：\n\n📧 邮件详情：\n发件人：${emailData.from}\n收件人：${emailData.to}\n主题：${emailData.subject}\n发送时间：${emailData.date}\n完整内容：${emailData.text}\n\n🎯 分析重点（按优先级）：\n1. **当前邮件核心内容**：重点分析发件人在这封邮件中的最新意图和需求\n2. **历史上下文参考**：利用历史往来理解背景，但不要让历史内容干扰对当前邮件的判断\n3. **时效性判断**：优先识别当前邮件中需要立即处理的事项\n\n📋 请提供以下分析，均在30字以内：\n1. 【意图分析】：邮件的主要目的和发件人的真实需求\n2. 【关键信息】：需要重点关注的要点，比如时间、地点、人物等\n3. 【建议回复】：提供具体的回复内容（简洁、专业、有针对性）\n\n请用中文回复，保持简洁专业和实用性，不多说一句废话。\n⚠️ 重要：请确保所有分析都以当前邮件为主，历史信息仅用于补充理解背景。`;\n\n// 保存原始邮件信息\nmsg.originalEmail = emailData;\nmsg.analysisPrompt = prompt;\n\n// 添加日志\nnode.log(`收到新邮件 - 发件人: ${emailData.from}, 主题: ${emailData.subject}`);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 480,
+        "wires": [
+            [
+                "7a21f4cdc4eb3f2b"
+            ]
+        ]
+    },
+    {
+        "id": "7a21f4cdc4eb3f2b",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "构建DeepSeek请求",
+        "func": "// 设置你的DeepSeek API Key\nconst API_KEY = \"YOUR_DEEPSEEK_API_KEY_HERE\"; // 请替换为你的实际API Key\n\n// 构建请求头\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${API_KEY}`\n};\n\n// 构建请求体\nmsg.payload = {\n    \"model\": \"deepseek-chat\",\n    \"messages\": [\n        {\n            \"role\": \"system\",\n            \"content\": \"你是一个经验丰富且非常会抓重点的邮件处理专家和商务沟通顾问，你擅长快速理解邮件意图，并提供得体、高效的回复建议，邮件可能用中文/英文撰写，但你需要统一分析成中文的给我\"\n        },\n        {\n            \"role\": \"user\",\n            \"content\": msg.analysisPrompt\n        }\n    ],\n    \"max_tokens\": 1000,\n    \"temperature\": 0.2\n};\n\n// 设置请求方法和URL\nmsg.method = \"POST\";\nmsg.url = \"https://api.deepseek.com/v1/chat/completions\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 480,
+        "wires": [
+            [
+                "69af0245fa561aa6"
+            ]
+        ]
+    },
+    {
+        "id": "69af0245fa561aa6",
+        "type": "http request",
+        "z": "eee4d6c3c137bc07",
+        "name": "调用DeepSeek API",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1130,
+        "y": 480,
+        "wires": [
+            [
+                "c728a18f0d7ca7b2"
+            ]
+        ]
+    },
+    {
+        "id": "c728a18f0d7ca7b2",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "处理AI分析结果",
+        "func": "// 检查响应状态\nif (msg.statusCode !== 200) {\n    msg.payload = {\n        error: true,\n        statusCode: msg.statusCode,\n        message: \"AI分析失败\",\n        originalEmail: msg.originalEmail,\n        timestamp: new Date().toISOString()\n    };\n    node.error(`API调用失败: ${msg.statusCode}`);\n    return msg;\n}\n\n// 提取AI分析结果\nif (msg.payload && msg.payload.choices && msg.payload.choices.length > 0) {\n    const aiAnalysis = msg.payload.choices[0].message.content;\n    \n    // 构建最终结果\n    msg.payload = {\n        success: true,\n        timestamp: new Date().toISOString(),\n        emailSummary: {\n            from: msg.originalEmail.from,\n            subject: msg.originalEmail.subject,\n            preview: msg.originalEmail.text.substring(0, 150) + (msg.originalEmail.text.length > 150 ? '...' : ''),\n            date: msg.originalEmail.date,\n            messageId: msg.originalEmail.messageId\n        },\n        fullEmailContent: msg.originalEmail.text,\n        aiAnalysis: aiAnalysis,\n        tokenUsage: msg.payload.usage || {}\n    };\n    \n    // 设置通知标题\n    msg.topic = `📧 新邮件AI分析完成 - ${msg.originalEmail.subject}`;\n    \n    node.log(`AI分析完成 - 邮件: ${msg.originalEmail.subject}`);\n    \n} else {\n    msg.payload = {\n        error: true,\n        message: \"AI响应格式异常\",\n        originalEmail: msg.originalEmail,\n        rawResponse: msg.payload\n    };\n    node.error(\"AI响应格式异常\");\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 480,
+        "wires": [
+            [
+                "20fdc53bb8c67f47",
+                "341722b326f9b29d"
+            ]
+        ]
+    },
+    {
+        "id": "341722b326f9b29d",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "构建提取请求",
+        "func": "// 只处理成功的分析结果\nif (!msg.payload.success) {\n    return null;\n}\n\n// 保存原始分析结果\nmsg.originalAnalysis = msg.payload;\n\n// 设置你的DeepSeek API Key\nconst API_KEY = \"YOUR_DEEPSEEK_API_KEY_HERE\"; // 请替换为你的实际API Key\n\n// 构建请求头\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${API_KEY}`\n};\n\n// 构建专门提取意图和行动的提示词\nconst extractPrompt = `请从以下邮件分析结果中，提取最核心的三个信息：\n\n${msg.payload.aiAnalysis}\n\n请严格按照以下格式输出，不要添加任何其他内容：\n意图：[一句话概括邮件的真实意图]\n关键信息：[需要重点关注的要点，比如时间、地点、人物等]\n行动：[一句话说明我应该怎么做]\n\n要求：\n- 每条不超过30个字\n- 直接给出结论，不要解释\n- 用最简洁的中文表达`;\n\n// 构建请求体\nmsg.payload = {\n    \"model\": \"deepseek-chat\",\n    \"messages\": [\n        {\n            \"role\": \"system\",\n            \"content\": \"你是信息提取专家，擅长从复杂文本中提取关键信息并用最简洁的语言表达。\"\n        },\n        {\n            \"role\": \"user\",\n            \"content\": extractPrompt\n        }\n    ],\n    \"max_tokens\": 200,\n    \"temperature\": 0.1\n};\n\n// 设置请求方法和URL\nmsg.method = \"POST\";\nmsg.url = \"https://api.deepseek.com/v1/chat/completions\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1650,
+        "y": 480,
+        "wires": [
+            [
+                "9149a89943e46f51"
+            ]
+        ]
+    },
+    {
+        "id": "9149a89943e46f51",
+        "type": "http request",
+        "z": "eee4d6c3c137bc07",
+        "name": "调用提取API",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1850,
+        "y": 480,
+        "wires": [
+            [
+                "6fbf7ac62636d5b5"
+            ]
+        ]
+    },
+    {
+        "id": "6fbf7ac62636d5b5",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "处理提取结果",
+        "func": "// 检查响应状态\nif (msg.statusCode !== 200) {\n    // 提取失败，使用默认值\n    msg.payload = {\n        intent: \"邮件需要处理\",\n        keyInfo: \"查看详细内容\",\n        action: \"查看详细分析\"\n    };\n    node.warn(\"AI提取失败，使用默认值\");\n} else if (msg.payload && msg.payload.choices && msg.payload.choices.length > 0) {\n    const extractedText = msg.payload.choices[0].message.content.trim();\n\n    // 解析AI提取的结果\n    let intent = \"邮件需要处理\";\n    let keyInfo = \"查看详细内容\";\n    let action = \"查看详细分析\";\n\n    // 提取意图\n    const intentMatch = extractedText.match(/意图[：:](.+?)(?=\\n|关键信息|行动|$)/s);\n    if (intentMatch) {\n        intent = intentMatch[1].trim();\n    }\n\n    // 提取关键信息\n    const keyInfoMatch = extractedText.match(/关键信息[：:](.+?)(?=\\n|行动|$)/s);\n    if (keyInfoMatch) {\n        keyInfo = keyInfoMatch[1].trim();\n    }\n\n    // 提取行动\n    const actionMatch = extractedText.match(/行动[：:](.+?)(?=\\n|$)/s);\n    if (actionMatch) {\n        action = actionMatch[1].trim();\n    }\n\n    msg.payload = {\n        intent: intent,\n        keyInfo: keyInfo,\n        action: action,\n        extractedText: extractedText\n    };\n} else {\n    // 响应格式异常，使用默认值\n    msg.payload = {\n        intent: \"邮件需要处理\",\n        keyInfo: \"查看详细内容\",\n        action: \"查看详细分析\"\n    };\n    node.warn(\"AI响应格式异常，使用默认值\");\n}\n\n// 恢复原始数据用于后续处理\nmsg.emailSummary = msg.originalAnalysis.emailSummary;\nmsg.fullAnalysis = msg.originalAnalysis.aiAnalysis;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2050,
+        "y": 480,
+        "wires": [
+            [
+                "a06ab672cbedbcd4",
+                "a19860455ae64b23"
+            ]
+        ]
+    },
+    {
+        "id": "a06ab672cbedbcd4",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "保存历史记录",
+        "func": "// 构建历史记录\nconst historyRecord = {\n    id: Date.now().toString(),\n    timestamp: new Date().toISOString(),\n    date: new Date().toLocaleString('zh-CN'),\n    emailInfo: {\n        from: msg.emailSummary.from,\n        subject: msg.emailSummary.subject,\n        preview: msg.emailSummary.preview,\n        messageId: msg.emailSummary.messageId\n    },\n    analysis: {\n        intent: msg.payload.intent || '未分析',\n        keyInfo: msg.payload.keyInfo || '无关键信息',\n        action: msg.payload.action || '无行动建议'\n    },\n    fullAnalysis: msg.fullAnalysis || '完整分析不可用'\n};\n\n// 获取现有历史记录\nlet emailHistory = context.get('emailHistory') || [];\n\n// 添加新记录到开头\nemailHistory.unshift(historyRecord);\n\n// 获取用户设置的保留数量，默认30条\nconst maxRecords = global.get('emailHistoryLimit') || 30;\n\n// 保持指定数量的记录\nif (emailHistory.length > maxRecords) {\n    emailHistory = emailHistory.slice(0, maxRecords);\n}\n\n// 保存更新后的历史\ncontext.set('emailHistory', emailHistory);\n\n// 更新统计信息\nlet stats = context.get('emailStats') || { totalProcessed: 0, lastUpdate: null };\nstats.totalProcessed += 1;\nstats.lastUpdate = new Date().toISOString();\ncontext.set('emailStats', stats);\n\n// 设置节点状态显示\nnode.status({\n    fill: \"blue\",\n    shape: \"dot\",\n    text: `已保存 ${emailHistory.length}/${maxRecords} 条记录`\n});\n\n// 日志记录\nnode.log(`历史记录已保存 - 当前共${emailHistory.length}条记录`);\n\n// 传递数据给下一个节点\nmsg.historyInfo = {\n    saved: true,\n    recordId: historyRecord.id,\n    totalRecords: emailHistory.length,\n    historyRecord: historyRecord\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2280,
+        "y": 420,
+        "wires": [
+            [
+                "9dbb2a6ec3cdae6f"
+            ]
+        ]
+    },
+    {
+        "id": "9dbb2a6ec3cdae6f",
+        "type": "debug",
+        "z": "eee4d6c3c137bc07",
+        "name": "📚 历史记录状态",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "historyInfo",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2500,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "20fdc53bb8c67f47",
+        "type": "debug",
+        "z": "eee4d6c3c137bc07",
+        "name": "📧 完整分析结果",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1670,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "a19860455ae64b23",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "准备网页数据",
+        "func": "// 构建邮件通知数据\nconst intent = msg.payload.intent || \"邮件需要处理\";\nconst keyInfo = msg.payload.keyInfo || \"查看详细内容\";\nconst action = msg.payload.action || \"查看详细分析\";\nconst from = msg.emailSummary.from || \"未知发件人\";\nconst subject = msg.emailSummary.subject || \"无主题\";\nconst preview = msg.emailSummary.preview || \"无内容预览\";\n\n// 构建通知对象\nconst notification = {\n    id: Date.now(),\n    timestamp: new Date().toISOString(),\n    displayTime: new Date().toLocaleString('zh-CN'),\n    from: from,\n    subject: subject,\n    preview: preview,\n    analysis: {\n        intent: intent,\n        keyInfo: keyInfo,\n        action: action\n    },\n    status: 'unread'\n};\n\n// 获取现有通知\nlet notifications = global.get('emailNotifications') || [];\n\n// 添加新通知到开头\nnotifications.unshift(notification);\n\n// 保持最近20条通知\nif (notifications.length > 20) {\n    notifications = notifications.slice(0, 20);\n}\n\n// 保存通知列表\nglobal.set('emailNotifications', notifications);\n\n// 传递数据到HTTP响应\nmsg.payload = {\n    success: true,\n    notification: notification,\n    totalNotifications: notifications.length\n};\n\nnode.log(`新邮件通知已添加: ${subject}`);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2280,
+        "y": 540,
+        "wires": [
+            [
+                "50393f1b8bd47686"
+            ]
+        ]
+    },
+    {
+        "id": "50393f1b8bd47686",
+        "type": "debug",
+        "z": "eee4d6c3c137bc07",
+        "name": "网页通知数据",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2520,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "27d6dcf481b8f2bd",
+        "type": "inject",
+        "z": "eee4d6c3c137bc07",
+        "name": "🧪 手动测试邮件",
+        "props": [
+            {
+                "p": "from",
+                "v": "客户张总 <example.customer@example.com>",
+                "vt": "str"
+            },
+            {
+                "p": "to",
+                "v": "我的邮箱 <your.email@example.com>",
+                "vt": "str"
+            },
+            {
+                "p": "subject",
+                "v": "紧急：项目延期问题需要立即讨论",
+                "vt": "str"
+            },
+            {
+                "p": "text",
+                "v": "您好，\\n\\n我刚收到项目组的报告，说我们的重要项目可能要延期2周。这个项目对我们Q4的业绩非常关键，我很担心会影响我们的合作关系。\\n\\n能否今天下午安排一个紧急会议讨论解决方案？我们需要尽快制定应对计划。\\n\\n另外，请告诉我具体的延期原因和你们的补救措施。\\n\\n期待您的快速回复。\\n\\n张总\\n2025年9月22日",
+                "vt": "str"
+            },
+            {
+                "p": "date",
+                "v": "2025-09-22T14:30:00+08:00",
+                "vt": "str"
+            },
+            {
+                "p": "messageId",
+                "v": "test-urgent-001@example.com",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 430,
+        "y": 680,
+        "wires": [
+            [
+                "3fd55876cde28b6d"
+            ]
+        ]
+    },
+    {
+        "id": "http_notifications_page",
+        "type": "http in",
+        "z": "eee4d6c3c137bc07",
+        "name": "邮件通知页面",
+        "url": "/notifications",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 450,
+        "y": 920,
+        "wires": [
+            [
+                "build_notifications_html"
+            ]
+        ]
+    },
+    {
+        "id": "build_notifications_html",
+        "type": "template",
+        "z": "eee4d6c3c137bc07",
+        "name": "构建现代化HTML页面",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "html",
+        "syntax": "plain",
+        "template": "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Email AI Assistant Dashboard</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'-apple-system',BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0b0d;color:#fff;min-height:100vh}.dashboard{display:flex;min-height:100vh}.sidebar{width:80px;background:#1a1b1e;display:flex;flex-direction:column;align-items:center;padding:20px 0;border-right:1px solid #2a2b2e}.logo{width:40px;height:40px;background:#007acc;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;margin-bottom:40px}.nav-item{width:48px;height:48px;background:#2a2b2e;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;cursor:pointer;transition:all 0.3s ease}.nav-item:hover{background:#3a3b3e}.nav-item.active{background:#007acc}.main-content{flex:1;padding:20px 30px;background:#0f1014}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}.greeting h1{font-size:28px;font-weight:600;margin-bottom:5px}.greeting p{color:#888;font-size:16px}.user-controls{display:flex;align-items:center;gap:15px}.refresh-btn{background:#2a2b2e;border:none;color:#fff;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px}.refresh-btn:hover{background:#3a3b3e}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:30px}.stat-card{background:#1a1b1e;border-radius:16px;padding:24px;border:1px solid #2a2b2e}.stat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.stat-title{color:#888;font-size:14px}.stat-value{font-size:32px;font-weight:700;margin-bottom:8px}.stat-change{font-size:14px}.positive{color:#10b981}.negative{color:#f59e0b}.content-section{background:#1a1b1e;border-radius:16px;padding:24px;border:1px solid #2a2b2e}.section-header{display:flex;justify-content:between;align-items:center;margin-bottom:20px}.section-title{font-size:20px;font-weight:600}.controls{display:flex;gap:12px;margin-bottom:20px}.btn{background:#2a2b2e;border:none;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px;transition:all 0.3s}.btn:hover{background:#3a3b3e}.btn-primary{background:#007acc}.btn-primary:hover{background:#0066aa}.btn-danger{background:#dc2626}.btn-danger:hover{background:#b91c1c}.email-list{display:flex;flex-direction:column;gap:12px}.email-item{background:#0f1014;border:1px solid #2a2b2e;border-radius:12px;padding:20px;transition:all 0.3s ease}.email-item:hover{border-color:#007acc;transform:translateY(-1px)}.email-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:16px}.email-info h3{font-size:16px;font-weight:600;margin-bottom:4px}.email-info p{color:#888;font-size:14px}.email-time{color:#666;font-size:12px}.email-analysis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:16px}.analysis-item{background:#1a1b1e;padding:12px 16px;border-radius:8px;border-left:3px solid #007acc}.analysis-label{color:#888;font-size:12px;margin-bottom:4px}.analysis-value{font-size:14px;line-height:1.4}.delete-btn{background:#dc2626;border:none;color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px}.delete-btn:hover{background:#b91c1c}.pagination{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:20px;border-top:1px solid #2a2b2e}.page-info{color:#888;font-size:14px}.empty-state{text-align:center;padding:60px 20px;color:#666}.empty-icon{font-size:48px;margin-bottom:16px}.select-dropdown{background:#2a2b2e;border:1px solid #3a3b3e;color:#fff;padding:8px 12px;border-radius:6px}</style></head><body><div class=\"dashboard\"><div class=\"sidebar\"><div class=\"logo\">EA</div><div class=\"nav-item active\">📧</div><div class=\"nav-item\">📊</div><div class=\"nav-item\">⚙️</div></div><div class=\"main-content\"><div class=\"header\"><div class=\"greeting\"><h1>邮件AI助手</h1><p>智能邮件分析与处理中心</p></div><div class=\"user-controls\"><button class=\"refresh-btn\" onclick=\"location.reload()\">🔄 刷新</button></div></div><div class=\"stats-grid\"><div class=\"stat-card\"><div class=\"stat-header\"><span class=\"stat-title\">总通知数</span><span>📬</span></div><div class=\"stat-value\" id=\"totalCount\">0</div><div class=\"stat-change positive\">+0 今日</div></div><div class=\"stat-card\"><div class=\"stat-header\"><span class=\"stat-title\">今日处理</span><span>✅</span></div><div class=\"stat-value\" id=\"todayCount\">0</div><div class=\"stat-change positive\" id=\"todayChange\">+0%</div></div><div class=\"stat-card\"><div class=\"stat-header\"><span class=\"stat-title\">最后更新</span><span>🕐</span></div><div class=\"stat-value\" style=\"font-size:18px\" id=\"lastUpdate\">--:--</div><div class=\"stat-change\">实时同步</div></div></div><div class=\"content-section\"><div class=\"section-header\"><div class=\"section-title\">邮件通知</div></div><div class=\"controls\"><select class=\"select-dropdown\" id=\"pageSize\" onchange=\"changePageSize(this.value)\"><option value=\"5\">5条/页</option><option value=\"10\" selected>10条/页</option><option value=\"20\">20条/页</option></select><button class=\"btn btn-danger\" onclick=\"clearAll()\">清空所有</button><button class=\"btn\" onclick=\"prevPage()\">上一页</button><button class=\"btn\" onclick=\"nextPage()\">下一页</button></div><div id=\"notifications\" class=\"email-list\"></div><div class=\"pagination\"><div class=\"page-info\" id=\"pageInfo\">第 1 页，共 1 页</div></div></div></div></div><script>let currentPage=1,pageSize=10,allData=[];function loadData(){fetch('/api/notifications').then(r=>r.json()).then(d=>{allData=d.notifications||[];updateStats(d);renderPage()}).catch(e=>console.error('Load error:',e))}function updateStats(data){document.getElementById('totalCount').textContent=data.total||0;document.getElementById('todayCount').textContent=data.todayCount||0;document.getElementById('lastUpdate').textContent=data.lastUpdate||'--:--';const change=data.todayCount>0?`+${Math.round((data.todayCount/data.total)*100)}%`:'0%';document.getElementById('todayChange').textContent=change}function renderPage(){const start=(currentPage-1)*pageSize;const items=allData.slice(start,start+pageSize);const container=document.getElementById('notifications');if(items.length===0){container.innerHTML='<div class=\"empty-state\"><div class=\"empty-icon\">📭</div><h3>暂无邮件通知</h3><p>AI分析结果会在这里显示</p></div>';updatePageInfo();return}container.innerHTML=items.map(item=>`<div class=\"email-item\"><div class=\"email-header\"><div class=\"email-info\"><h3>${escapeHtml(item.subject||'无主题')}</h3><p>来自: ${escapeHtml(item.from||'未知发件人')}</p></div><div style=\"display:flex;align-items:center;gap:12px\"><span class=\"email-time\">${item.displayTime||''}</span><button class=\"delete-btn\" onclick=\"deleteItem('${item.id}')\">删除</button></div></div><div class=\"email-analysis\"><div class=\"analysis-item\" style=\"border-left-color:#10b981\"><div class=\"analysis-label\">意图分析</div><div class=\"analysis-value\">${escapeHtml(item.analysis?.intent||'未分析')}</div></div><div class=\"analysis-item\" style=\"border-left-color:#f59e0b\"><div class=\"analysis-label\">关键信息</div><div class=\"analysis-value\">${escapeHtml(item.analysis?.keyInfo||'无')}</div></div><div class=\"analysis-item\" style=\"border-left-color:#dc2626\"><div class=\"analysis-label\">建议行动</div><div class=\"analysis-value\">${escapeHtml(item.analysis?.action||'无')}</div></div></div></div>`).join('');updatePageInfo()}function updatePageInfo(){const totalPages=Math.ceil(allData.length/pageSize);document.getElementById('pageInfo').textContent=`第 ${currentPage} 页，共 ${totalPages} 页 (${allData.length} 条记录)`}function changePageSize(size){pageSize=parseInt(size);currentPage=1;renderPage()}function prevPage(){if(currentPage>1){currentPage--;renderPage()}}function nextPage(){const totalPages=Math.ceil(allData.length/pageSize);if(currentPage<totalPages){currentPage++;renderPage()}}function deleteItem(id){if(confirm('确定要删除这条通知吗？')){fetch('/api/notifications/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}).then(r=>r.json()).then(d=>{if(d.success){loadData()}else{alert('删除失败')}}).catch(e=>{console.error('Delete error:',e);alert('删除失败')})}}function clearAll(){if(confirm('确定要清空所有通知吗？此操作不可恢复！')){fetch('/api/notifications/clear',{method:'POST'}).then(r=>r.json()).then(d=>{if(d.success){loadData()}else{alert('清空失败')}}).catch(e=>{console.error('Clear error:',e);alert('清空失败')})}}function escapeHtml(text){const div=document.createElement('div');div.textContent=text;return div.innerHTML}loadData();setInterval(loadData,30000)</script></body></html>",
+        "output": "str",
+        "x": 670,
+        "y": 920,
+        "wires": [
+            [
+                "http_response_page"
+            ]
+        ]
+    },
+    {
+        "id": "http_response_page",
+        "type": "http response",
+        "z": "eee4d6c3c137bc07",
+        "name": "返回HTML页面",
+        "statusCode": "",
+        "headers": {},
+        "x": 880,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "http_api_notifications",
+        "type": "http in",
+        "z": "eee4d6c3c137bc07",
+        "name": "通知API接口",
+        "url": "/api/notifications",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 450,
+        "y": 980,
+        "wires": [
+            [
+                "get_notifications_data"
+            ]
+        ]
+    },
+    {
+        "id": "get_notifications_data",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "获取通知数据",
+        "func": "const notifications = global.get('emailNotifications') || [];\nconst today = new Date().toDateString();\nconst todayCount = notifications.filter(n => new Date(n.timestamp).toDateString() === today).length;\nconst lastUpdate = notifications.length > 0 ? new Date(notifications[0].timestamp).toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'}) : '--:--';\n\nmsg.payload = {\n    success: true,\n    total: notifications.length,\n    todayCount: todayCount,\n    lastUpdate: lastUpdate,\n    notifications: notifications\n};\n\nmsg.statusCode = 200;\nmsg.headers = {'Content-Type': 'application/json'};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 980,
+        "wires": [
+            [
+                "http_response_api"
+            ]
+        ]
+    },
+    {
+        "id": "http_response_api",
+        "type": "http response",
+        "z": "eee4d6c3c137bc07",
+        "name": "返回API数据",
+        "statusCode": "",
+        "headers": {},
+        "x": 870,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "http_delete_single",
+        "type": "http in",
+        "z": "eee4d6c3c137bc07",
+        "name": "删除单个通知",
+        "url": "/api/notifications/delete",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 450,
+        "y": 1040,
+        "wires": [
+            [
+                "delete_single_notification"
+            ]
+        ]
+    },
+    {
+        "id": "delete_single_notification",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "删除单个通知处理",
+        "func": "const { id } = msg.payload;\nif (!id) {\n    msg.payload = { success: false, error: '缺少通知ID' };\n    msg.statusCode = 400;\n    return msg;\n}\n\nlet notifications = global.get('emailNotifications') || [];\nconst originalLength = notifications.length;\nnotifications = notifications.filter(n => n.id != id);\nglobal.set('emailNotifications', notifications);\n\nif (notifications.length < originalLength) {\n    msg.payload = { success: true, message: '通知删除成功', remainingCount: notifications.length };\n    node.log(`通知删除成功: ${id}`);\n} else {\n    msg.payload = { success: false, error: '未找到指定通知' };\n}\n\nmsg.statusCode = 200;\nmsg.headers = { 'Content-Type': 'application/json' };\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 1040,
+        "wires": [
+            [
+                "http_response_delete"
+            ]
+        ]
+    },
+    {
+        "id": "http_clear_all",
+        "type": "http in",
+        "z": "eee4d6c3c137bc07",
+        "name": "清空所有通知",
+        "url": "/api/notifications/clear",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 450,
+        "y": 1100,
+        "wires": [
+            [
+                "clear_all_notifications"
+            ]
+        ]
+    },
+    {
+        "id": "clear_all_notifications",
+        "type": "function",
+        "z": "eee4d6c3c137bc07",
+        "name": "清空所有通知处理",
+        "func": "const notifications = global.get('emailNotifications') || [];\nconst clearedCount = notifications.length;\nglobal.set('emailNotifications', []);\n\nmsg.payload = { success: true, message: `已清空所有通知`, clearedCount: clearedCount };\nmsg.statusCode = 200;\nmsg.headers = { 'Content-Type': 'application/json' };\nnode.log(`所有通知已清空: ${clearedCount}条`);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 1100,
+        "wires": [
+            [
+                "http_response_delete"
+            ]
+        ]
+    },
+    {
+        "id": "http_response_delete",
+        "type": "http response",
+        "z": "eee4d6c3c137bc07",
+        "name": "返回删除结果",
+        "statusCode": "",
+        "headers": {},
+        "x": 920,
+        "y": 1070,
+        "wires": []
+    },
+    {
+        "id": "7b8558cce3b3526f",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-email": "3.1.0"
+        }
+    }
+]
