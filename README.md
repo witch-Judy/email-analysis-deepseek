@@ -8,11 +8,14 @@ An intelligent email analysis assistant based on Node-RED, utilizing DeepSeek AI
 
 ## 📸 Project Preview
 
-### Node-RED Flow Library Page
-![Node-RED Flow库](noderedGraphics/noderedFlowLibrary.png)
-
 ### Complete System Interface
 ![完整页面](noderedGraphics/WholePage.png)
+### Main Interface
+![网站UI界面1](noderedGraphics/website-UI-1.png)
+
+### Select number of emails per page
+![网站UI界面2](noderedGraphics/website-UI-2.png)
+
 
 ## 🚀 Features
 
@@ -122,12 +125,6 @@ email-analysis-deepseek/
 - **Notification Management**: Delete and clear notification functionality
 
 ### Interface Preview
-
-#### Main Interface
-![网站UI界面1](noderedGraphics/website-UI-1.png)
-
-#### Email Analysis Details
-![网站UI界面2](noderedGraphics/website-UI-2.png)
 
 ## 📊 Data Management
 
