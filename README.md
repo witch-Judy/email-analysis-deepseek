@@ -10,11 +10,9 @@ An intelligent email analysis assistant based on Node-RED, utilizing DeepSeek AI
 
 ### Complete System Interface
 ![完整页面](noderedGraphics/WholePage.png)
-### Main Interface
-![网站UI界面1](noderedGraphics/website-UI-1.png)
 
-### Select number of emails per page
-![网站UI界面2](noderedGraphics/website-UI-2.png)
+### Main Interface
+![网站UI界面](noderedGraphics/website-UI-3.jpg)
 
 
 ## 🚀 Features
@@ -67,8 +65,7 @@ email-analysis-deepseek/
 └── noderedGraphics/               # Project screenshots
     ├── nodered-flow.png
     ├── noderedFlowLibrary.png
-    ├── website-UI-1.png
-    ├── website-UI-2.png
+    ├── website-UI-3.jpg
     └── WholePage.png
 ```
 
