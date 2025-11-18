@@ -1,0 +1,147 @@
+# 🚀 GitHub Codespaces 快速开始指南
+
+这个项目已经完全配置好 GitHub Codespaces，可以在浏览器中直接使用，无需本地安装任何软件！
+
+## ⚡ 一键开始
+
+### 步骤 1: 创建 Codespace
+
+1. 在 GitHub 仓库页面，点击绿色的 **"Code"** 按钮
+2. 选择 **"Codespaces"** 标签
+3. 点击 **"Create codespace on main"**
+
+等待 1-2 分钟，环境会自动配置完成。
+
+### 步骤 2: 配置 API 密钥
+
+1. 打开项目根目录的 `.env` 文件
+2. 编辑并填入你的 API 密钥：
+
+```bash
+# DeepSeek API Key
+DEEPSEEK_API_KEY=sk-your-actual-api-key-here
+
+# Gmail OAuth2 Token
+GMAIL_OAUTH_TOKEN=your_gmail_oauth_token_here
+```
+
+### 步骤 3: 启动 Node-RED
+
+在终端中运行：
+
+```bash
+./start-nodered.sh
+```
+
+### 步骤 4: 访问 Node-RED
+
+1. 在 VS Code 底部，点击 **"Ports"** 标签
+2. 找到端口 **1880** (Node-RED)
+3. 点击端口号旁边的 🌐 图标，选择 **"Open in Browser"**
+
+### 步骤 5: 导入 Flow
+
+1. 在 Node-RED 编辑器中，点击右上角菜单（☰）
+2. 选择 **"Import"**
+3. 选择 `flows/flow-english.json` 或 `flows/flow-chinese.json`
+4. 点击 **"Deploy"** 按钮
+
+### 步骤 6: 访问 Web 界面
+
+部署完成后，访问：
+```
+http://localhost:1880/notifications
+```
+
+## 📋 环境变量说明
+
+所有配置都在 `.env` 文件中：
+
+| 变量名 | 说明 | 必需 |
+|--------|------|------|
+| `DEEPSEEK_API_KEY` | DeepSeek API 密钥 | ✅ 是 |
+| `GMAIL_OAUTH_TOKEN` | Gmail OAuth2 令牌 | ✅ 是 |
+| `GMAIL_IMAP_SERVER` | IMAP 服务器地址 | ❌ 否（默认：imap.gmail.com）|
+| `GMAIL_IMAP_PORT` | IMAP 端口 | ❌ 否（默认：993）|
+
+## 🔍 如何获取 API 密钥
+
+### DeepSeek API Key
+
+1. 访问 [DeepSeek 官网](https://www.deepseek.com/)
+2. 注册并登录账号
+3. 进入 API 管理页面
+4. 创建新的 API 密钥
+5. 复制密钥（格式：`sk-xxxxxxxxxxxxxxxx`）
+
+### Gmail OAuth2 Token
+
+1. 访问 [Google Cloud Console](https://console.cloud.google.com/)
+2. 创建新项目或选择现有项目
+3. 启用 Gmail API
+4. 创建 OAuth2 凭据
+5. 配置重定向 URI
+6. 获取访问令牌
+
+详细步骤请参考 [SETUP.md](SETUP.md)
+
+## 🛠️ 常用命令
+
+```bash
+# 启动 Node-RED（自动加载 .env）
+./start-nodered.sh
+
+# 手动启动 Node-RED
+node-red
+
+# 检查环境变量
+cat .env
+
+# 查看 Node-RED 日志
+# 在运行 Node-RED 的终端中查看
+```
+
+## ❓ 常见问题
+
+### Q: 端口 1880 无法访问？
+
+A: 
+1. 检查 VS Code 的 "Ports" 标签
+2. 确保端口已转发（应该显示为 "Forwarded"）
+3. 点击端口号旁边的图标打开浏览器
+
+### Q: Node-RED 启动失败？
+
+A:
+1. 检查 `.env` 文件是否正确配置
+2. 确保所有必需的环境变量都已设置
+3. 查看终端错误信息
+
+### Q: API 调用失败？
+
+A:
+1. 检查 `DEEPSEEK_API_KEY` 是否正确
+2. 确认 API 密钥有效且有足够的配额
+3. 查看 Node-RED 的调试输出
+
+### Q: 如何停止 Node-RED？
+
+A: 在运行 Node-RED 的终端中按 `Ctrl+C`
+
+## 📚 更多资源
+
+- **详细配置指南**: [SETUP.md](SETUP.md)
+- **项目文档**: [README.md](README.md)
+- **Codespaces 配置**: [.devcontainer/README.md](.devcontainer/README.md)
+
+## 💡 提示
+
+- ✅ `.env` 文件不会被提交到 Git（已在 .gitignore 中）
+- ✅ 修改 `.env` 后需要重启 Node-RED
+- ✅ 可以在多个终端标签页中运行不同命令
+- ✅ 使用 `&` 可以在后台运行进程
+
+---
+
+**享受在 Codespaces 中使用 Email AI Assistant！** 🎉
+

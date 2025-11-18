@@ -27,6 +27,20 @@ An intelligent email analysis assistant based on Node-RED, utilizing DeepSeek AI
 
 ## 🚀 Quick Start
 
+### Method 0: Use GitHub Codespaces (Easiest - No Local Installation!)
+
+> 🎉 **New!** This project is fully configured for GitHub Codespaces. Use it directly in your browser!
+
+1. Click the green **"Code"** button on GitHub
+2. Select **"Codespaces"** tab
+3. Click **"Create codespace on main"**
+4. Wait for environment setup (1-2 minutes)
+5. Edit `.env` file and add your API keys
+6. Run `./start-nodered.sh` to start Node-RED
+7. Access Node-RED at the forwarded port 1880
+
+📚 **Detailed guide**: See [CODESPACES.md](CODESPACES.md) for complete instructions.
+
 ### Method 1: Install npm Package (Simplest)
 ```bash
 cd ~/.node-red

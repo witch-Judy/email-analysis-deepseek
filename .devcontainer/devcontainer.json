@@ -1,0 +1,47 @@
+{
+	"name": "Email AI Assistant - Node-RED",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye",
+	
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"node-red.node-red",
+				"ms-vscode.vscode-json"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash"
+			}
+		}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [1880],
+	"portsAttributes": {
+		"1880": {
+			"label": "Node-RED Editor",
+			"onAutoForward": "openBrowser",
+			"protocol": "http"
+		}
+	},
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "bash .devcontainer/setup.sh",
+
+	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "node",
+	
+	"remoteEnv": {
+		"NODE_RED_HOME": "${containerWorkspaceFolder}/.node-red"
+	},
+	
+	// Commands to run after container is created
+	"postStartCommand": "echo '✅ Codespace ready! Run ./start-nodered.sh to start Node-RED'"
+}
+

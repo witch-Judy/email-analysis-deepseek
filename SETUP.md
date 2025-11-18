@@ -90,36 +90,77 @@ After importing, you need to configure the following key parameters:
 - **Token**: Configure OAuth2 access token
 
 #### API Configuration
-- **API Key**: Replace with your DeepSeek API key
+- **API Key**: Configure via environment variable `DEEPSEEK_API_KEY` (see Step 4.2)
 - **API Endpoint**: `https://api.deepseek.com/v1/chat/completions`
 - **Model**: `deepseek-chat`
 
 ## ⚙️ Step 4: Detailed Configuration
 
-### 4.1 Email Monitoring Node Configuration
+### 4.1 Email Monitoring Configuration (Using Environment Variables)
 
-1. Double-click the "IMAP Email Monitor" node
-2. Configure the following parameters:
-   ```
-   Server: imap.gmail.com
-   Port: 993
-   Use SSL: Yes
-   Authentication Type: OAuth2
-   Token: YOUR_OAUTH_ACCESS_TOKEN_HERE
-   Mailbox: INBOX
-   Check Interval: 30 seconds
+**Recommended Method: Using .env file**
+
+The email monitoring configuration now uses environment variables. You no longer need to manually configure the IMAP node in Node-RED editor.
+
+1. Edit your `.env` file and add your Gmail OAuth2 token:
+   ```bash
+   GMAIL_OAUTH_TOKEN=your_gmail_oauth_token_here
    ```
 
-### 4.2 API Request Node Configuration
-
-1. Find the "Build DeepSeek Request" node
-2. Edit the function code and replace the API key:
-   ```javascript
-   const API_KEY = "YOUR_DEEPSEEK_API_KEY_HERE";
+2. Optional: Configure IMAP server and port (defaults are already set):
+   ```bash
+   GMAIL_IMAP_SERVER=imap.gmail.com  # Optional, defaults to imap.gmail.com
+   GMAIL_IMAP_PORT=993              # Optional, defaults to 993
    ```
 
-3. Find the "Build Extraction Request" node
-4. Replace the API key in the same way
+3. The flow will automatically use these environment variables when you start Node-RED with the provided script:
+   ```bash
+   ./start-nodered.sh
+   ```
+
+**Note**: 
+- The email monitoring node will automatically read `GMAIL_OAUTH_TOKEN` from environment variables
+- If you need to use a different email provider, you can set `GMAIL_IMAP_SERVER` and `GMAIL_IMAP_PORT` accordingly
+- The token must be a valid OAuth2 access token with Gmail API permissions
+
+### 4.2 API Configuration (Using Environment Variables)
+
+**Recommended Method: Using .env file**
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file and add your API keys:
+   ```bash
+   DEEPSEEK_API_KEY=sk-your-actual-api-key-here
+   GMAIL_OAUTH_TOKEN=your_gmail_oauth_token_here
+   ```
+
+3. Start Node-RED using the provided script (which automatically loads .env):
+   ```bash
+   ./start-nodered.sh
+   ```
+
+   Or manually load environment variables before starting Node-RED:
+   ```bash
+   export $(cat .env | grep -v '^#' | xargs)
+   node-red
+   ```
+
+**Alternative Method: Set Environment Variable Directly**
+
+You can also set the environment variable directly before starting Node-RED:
+```bash
+export DEEPSEEK_API_KEY=sk-your-actual-api-key-here
+node-red
+```
+
+**Note**: 
+- The flow files now automatically read the API key from the `DEEPSEEK_API_KEY` environment variable
+- The email monitoring node automatically reads `GMAIL_OAUTH_TOKEN` from environment variables
+- You no longer need to manually edit the function nodes or email node configuration
 
 ### 4.3 Web Interface Configuration
 
@@ -251,9 +292,11 @@ if (notifications.length > 20) {
 ## 🔒 Security Recommendations
 
 1. **API Key Security**:
-   - Do not hardcode API keys in code
+   - ✅ **Already implemented**: API keys are now stored in `.env` file (not hardcoded)
+   - Never commit `.env` file to version control (already in `.gitignore`)
    - Use environment variables to store sensitive information
    - Regularly rotate API keys
+   - Share `.env.example` (without real keys) as a template
 
 2. **Access Control**:
    - Limit web interface access permissions
