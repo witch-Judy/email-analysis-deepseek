@@ -49,10 +49,20 @@ else
     echo "ℹ️  .env file already exists"
 fi
 
-# Make start script executable
+# Make start scripts executable
 if [ -f "${containerWorkspaceFolder}/start-nodered.sh" ]; then
     chmod +x "${containerWorkspaceFolder}/start-nodered.sh"
     echo "✅ Made start-nodered.sh executable"
+fi
+
+if [ -f "${containerWorkspaceFolder}/.devcontainer/start-nodered-background.sh" ]; then
+    chmod +x "${containerWorkspaceFolder}/.devcontainer/start-nodered-background.sh"
+    echo "✅ Made start-nodered-background.sh executable"
+fi
+
+if [ -f "${containerWorkspaceFolder}/.devcontainer/stop-nodered.sh" ]; then
+    chmod +x "${containerWorkspaceFolder}/.devcontainer/stop-nodered.sh"
+    echo "✅ Made stop-nodered.sh executable"
 fi
 
 echo "✅ Setup complete!"
@@ -68,8 +78,10 @@ echo "   - Add your Gmail OAuth2 token:"
 echo "     GMAIL_OAUTH_TOKEN=your_gmail_oauth_token_here"
 echo ""
 echo "2️⃣  Start Node-RED:"
-echo "   - Run: ./start-nodered.sh"
-echo "   - Or: node-red (if .env is already loaded)"
+echo "   - Node-RED will auto-start in background when Codespace starts"
+echo "   - Or manually run: ./start-nodered.sh"
+echo "   - Or run in background: bash .devcontainer/start-nodered-background.sh"
+echo "   - To stop: bash .devcontainer/stop-nodered.sh"
 echo ""
 echo "3️⃣  Access Node-RED:"
 echo "   - The port 1880 will be automatically forwarded"

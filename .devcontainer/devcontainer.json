@@ -41,7 +41,7 @@
 		"NODE_RED_HOME": "${containerWorkspaceFolder}/.node-red"
 	},
 	
-	// Commands to run after container is created
-	"postStartCommand": "echo '✅ Codespace ready! Run ./start-nodered.sh to start Node-RED'"
+	// Commands to run after container starts (runs every time Codespace starts)
+	"postStartCommand": "bash .devcontainer/start-nodered-background.sh || echo '⚠️  Node-RED auto-start failed. Run ./start-nodered.sh manually.'"
 }
 

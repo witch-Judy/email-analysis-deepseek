@@ -27,10 +27,19 @@ GMAIL_OAUTH_TOKEN=your_gmail_oauth_token_here
 
 ### 步骤 3: 启动 Node-RED
 
-在终端中运行：
+**好消息！** Node-RED 现在会在 Codespace 启动时自动在后台运行。
+
+如果自动启动失败，可以手动启动：
 
 ```bash
+# 方法 1: 前台运行（会占用终端）
 ./start-nodered.sh
+
+# 方法 2: 后台运行（推荐）
+bash .devcontainer/start-nodered-background.sh
+
+# 停止 Node-RED
+bash .devcontainer/stop-nodered.sh
 ```
 
 ### 步骤 4: 访问 Node-RED
@@ -88,17 +97,26 @@ http://localhost:1880/notifications
 ## 🛠️ 常用命令
 
 ```bash
-# 启动 Node-RED（自动加载 .env）
+# Node-RED 会在 Codespace 启动时自动运行
+# 如果未自动启动，可以使用以下命令：
+
+# 前台启动（占用终端）
 ./start-nodered.sh
 
-# 手动启动 Node-RED
-node-red
+# 后台启动（推荐，不占用终端）
+bash .devcontainer/start-nodered-background.sh
+
+# 停止 Node-RED
+bash .devcontainer/stop-nodered.sh
+
+# 检查 Node-RED 是否运行
+ps aux | grep node-red
+
+# 查看 Node-RED 日志（后台运行时）
+tail -f .node-red/logs/nodered.log
 
 # 检查环境变量
 cat .env
-
-# 查看 Node-RED 日志
-# 在运行 Node-RED 的终端中查看
 ```
 
 ## ❓ 常见问题
@@ -189,8 +207,20 @@ A: 在运行 Node-RED 的终端中按 `Ctrl+C`
 ### Q: 如何重启 Node-RED？
 
 A:
-1. 停止当前运行的 Node-RED（`Ctrl+C`）
-2. 重新运行 `./start-nodered.sh`
+```bash
+# 方法 1: 使用停止脚本
+bash .devcontainer/stop-nodered.sh
+bash .devcontainer/start-nodered-background.sh
+
+# 方法 2: 如果在前台运行，按 Ctrl+C 停止，然后重新启动
+```
+
+### Q: Node-RED 会自动启动吗？
+
+A: 
+- ✅ **是的！** Node-RED 会在 Codespace 启动时自动在后台运行
+- 如果自动启动失败，可以手动运行 `bash .devcontainer/start-nodered-background.sh`
+- 查看日志：`tail -f .node-red/logs/nodered.log`
 
 ## 📚 更多资源
 
