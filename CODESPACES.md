@@ -226,6 +226,35 @@ A:
 - ✅ **是的！** Node-RED 会在 Codespace 启动时自动在后台运行
 - 如果自动启动失败，可以手动运行 `bash .devcontainer/start-nodered-background.sh`
 - 查看日志：`tail -f .node-red/logs/nodered.log`
+- 检查状态：`bash .devcontainer/check-nodered.sh`
+
+### Q: 自动启动失败了怎么办？
+
+A:
+1. **检查 Node-RED 是否安装**
+   ```bash
+   which node-red
+   node-red --version
+   ```
+
+2. **查看启动日志**
+   ```bash
+   cat .node-red/logs/nodered.log
+   ```
+
+3. **手动启动**
+   ```bash
+   # 前台启动（可以看到错误信息）
+   ./start-nodered.sh
+   
+   # 后台启动
+   bash .devcontainer/start-nodered-background.sh
+   ```
+
+4. **检查状态**
+   ```bash
+   bash .devcontainer/check-nodered.sh
+   ```
 
 ## 📚 更多资源
 

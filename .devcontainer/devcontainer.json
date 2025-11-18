@@ -42,6 +42,7 @@
 	},
 	
 	// Commands to run after container starts (runs every time Codespace starts)
-	"postStartCommand": "bash .devcontainer/start-nodered-background.sh || echo '⚠️  Node-RED auto-start failed. Run ./start-nodered.sh manually.'"
+	// Note: This runs after postCreateCommand, so Node-RED should be installed
+	"postStartCommand": "sleep 2 && bash .devcontainer/start-nodered-background.sh || echo '⚠️  Node-RED auto-start failed. Run ./start-nodered.sh manually.'"
 }
 
