@@ -16,7 +16,27 @@
 				"ms-vscode.vscode-json"
 			],
 			"settings": {
-				"terminal.integrated.defaultProfile.linux": "bash"
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "/bin/bash",
+						"args": ["--login"]
+					}
+				}
+			},
+			"tasks": {
+				"version": "2.0.0",
+				"tasks": [
+					{
+						"label": "Start Node-RED",
+						"type": "shell",
+						"command": "bash .devcontainer/start-nodered-background.sh",
+						"problemMatcher": [],
+						"runOptions": {
+							"runOn": "folderOpen"
+						}
+					}
+				]
 			}
 		}
 	},
@@ -43,6 +63,9 @@
 	
 	// Commands to run after container starts (runs every time Codespace starts)
 	// Note: This runs after postCreateCommand, so Node-RED should be installed
-	"postStartCommand": "sleep 2 && bash .devcontainer/start-nodered-background.sh || echo '⚠️  Node-RED auto-start failed. Run ./start-nodered.sh manually.'"
+	"postStartCommand": "sleep 2 && bash .devcontainer/start-nodered-background.sh || echo '⚠️  Node-RED auto-start failed. Run ./start-nodered.sh manually.'",
+	
+	// Commands to run after VS Code attaches to the container (more reliable)
+	"postAttachCommand": "bash .devcontainer/post-attach.sh"
 }
 

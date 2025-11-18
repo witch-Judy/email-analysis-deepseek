@@ -32,7 +32,10 @@ GMAIL_OAUTH_TOKEN=your_gmail_oauth_token_here
 
 ### 步骤 3: 启动 Node-RED
 
-**好消息！** Node-RED 现在会在 Codespace 启动时自动在后台运行。
+**好消息！** Node-RED 会在以下情况自动启动：
+- ✅ 当 VS Code 连接到 Codespace 时（postAttachCommand）
+- ✅ 当你打开新的终端时（.bashrc）
+- ✅ 当文件夹打开时（VS Code task）
 
 如果自动启动失败，可以手动启动：
 

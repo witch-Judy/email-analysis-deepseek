@@ -65,6 +65,17 @@ if [ -f "${containerWorkspaceFolder}/.devcontainer/stop-nodered.sh" ]; then
     echo "✅ Made stop-nodered.sh executable"
 fi
 
+# Setup bashrc for auto-start
+if [ -f "${containerWorkspaceFolder}/.devcontainer/.bashrc" ]; then
+    # Append to user's .bashrc if not already there
+    if ! grep -q "Auto-start Node-RED" ~/.bashrc 2>/dev/null; then
+        echo "" >> ~/.bashrc
+        echo "# Auto-start Node-RED (from devcontainer)" >> ~/.bashrc
+        cat "${containerWorkspaceFolder}/.devcontainer/.bashrc" >> ~/.bashrc
+        echo "✅ Configured bashrc for auto-start"
+    fi
+fi
+
 echo "✅ Setup complete!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
