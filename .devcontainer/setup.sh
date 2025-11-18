@@ -65,7 +65,7 @@ if [ -f "${containerWorkspaceFolder}/.devcontainer/stop-nodered.sh" ]; then
     echo "✅ Made stop-nodered.sh executable"
 fi
 
-# Setup bashrc for auto-start
+# Setup bashrc for auto-start and welcome message
 if [ -f "${containerWorkspaceFolder}/.devcontainer/.bashrc" ]; then
     # Append to user's .bashrc if not already there
     if ! grep -q "Auto-start Node-RED" ~/.bashrc 2>/dev/null; then
@@ -73,6 +73,21 @@ if [ -f "${containerWorkspaceFolder}/.devcontainer/.bashrc" ]; then
         echo "# Auto-start Node-RED (from devcontainer)" >> ~/.bashrc
         cat "${containerWorkspaceFolder}/.devcontainer/.bashrc" >> ~/.bashrc
         echo "✅ Configured bashrc for auto-start"
+    fi
+fi
+
+# Add welcome message to bashrc (only show once per session)
+if [ -f "${containerWorkspaceFolder}/.devcontainer/welcome.sh" ]; then
+    chmod +x "${containerWorkspaceFolder}/.devcontainer/welcome.sh"
+    if ! grep -q "welcome.sh" ~/.bashrc 2>/dev/null; then
+        echo "" >> ~/.bashrc
+        echo "# Show welcome message (only in Codespaces)" >> ~/.bashrc
+        echo "if [ -n \"\$CODESPACE_NAME\" ] || [ -n \"\$CODESPACES\" ]; then" >> ~/.bashrc
+        echo "    if [ -z \"\$WELCOME_SHOWN\" ]; then" >> ~/.bashrc
+        echo "        bash \"${containerWorkspaceFolder}/.devcontainer/welcome.sh\"" >> ~/.bashrc
+        echo "        export WELCOME_SHOWN=1" >> ~/.bashrc
+        echo "    fi" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
     fi
 fi
 

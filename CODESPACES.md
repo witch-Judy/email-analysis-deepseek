@@ -32,12 +32,18 @@ GMAIL_OAUTH_TOKEN=your_gmail_oauth_token_here
 
 ### 步骤 3: 启动 Node-RED
 
-**好消息！** Node-RED 会在以下情况自动启动：
+**自动启动机制：**
 - ✅ 当 VS Code 连接到 Codespace 时（postAttachCommand）
 - ✅ 当你打开新的终端时（.bashrc）
 - ✅ 当文件夹打开时（VS Code task）
 
-如果自动启动失败，可以手动启动：
+**如果自动启动没有工作（这是正常的），只需运行一个命令：**
+
+```bash
+./start-nodered.sh
+```
+
+就这么简单！打开终端，运行这个命令，Node-RED 就会启动。
 
 ```bash
 # 方法 1: 前台运行（会占用终端）
