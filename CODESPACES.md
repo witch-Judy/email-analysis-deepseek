@@ -6,9 +6,14 @@
 
 ### 步骤 1: 创建 Codespace
 
-1. 在 GitHub 仓库页面，点击绿色的 **"Code"** 按钮
-2. 选择 **"Codespaces"** 标签
-3. 点击 **"Create codespace on main"**
+1. **打开你的 GitHub 仓库**
+   - 访问：`https://github.com/witch-Judy/email-analysis-deepseek`
+   - 确保页面左上角显示 **`main`** 分支（如果不是，点击分支下拉菜单选择 `main`）
+
+2. **创建 Codespace**
+   - 点击绿色的 **"Code"** 按钮
+   - 选择 **"Codespaces"** 标签
+   - 点击 **"Create codespace on main"** 或 **"+"** 按钮
 
 等待 1-2 分钟，环境会自动配置完成。
 
@@ -227,6 +232,7 @@ A:
 - **详细配置指南**: [SETUP.md](SETUP.md)
 - **项目文档**: [README.md](README.md)
 - **Codespaces 配置**: [.devcontainer/README.md](.devcontainer/README.md)
+- **Codespaces 使用指南**: [.devcontainer/CODESPACES_GUIDE.md](.devcontainer/CODESPACES_GUIDE.md) - 关于分支和 Codespaces 的详细说明
 - **故障排除**: [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - 遇到 502 错误？看这里！
 
 ## 💡 提示
