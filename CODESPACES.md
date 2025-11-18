@@ -103,12 +103,51 @@ cat .env
 
 ## ❓ 常见问题
 
+### ❌ HTTP ERROR 502 - 无法处理此请求
+
+**问题原因：** 端口已转发，但 Node-RED 服务没有运行。
+
+**解决方法：**
+
+1. **检查 Node-RED 是否运行**
+   ```bash
+   # 在终端中检查进程
+   ps aux | grep node-red
+   ```
+
+2. **启动 Node-RED**
+   ```bash
+   # 使用启动脚本（推荐）
+   ./start-nodered.sh
+   
+   # 或者手动启动
+   node-red
+   ```
+
+3. **检查端口是否被占用**
+   ```bash
+   # 检查端口 1880 是否被占用
+   lsof -i :1880
+   ```
+
+4. **查看 Node-RED 日志**
+   - 在运行 Node-RED 的终端中查看错误信息
+   - 检查是否有启动错误
+
+5. **确认环境变量已加载**
+   ```bash
+   # 检查环境变量
+   echo $DEEPSEEK_API_KEY
+   echo $GMAIL_OAUTH_TOKEN
+   ```
+
 ### Q: 端口 1880 无法访问？
 
 A: 
 1. 检查 VS Code 的 "Ports" 标签
 2. 确保端口已转发（应该显示为 "Forwarded"）
 3. 点击端口号旁边的图标打开浏览器
+4. **重要：** 确保 Node-RED 已经启动（见上面的 502 错误解决方法）
 
 ### Q: Node-RED 启动失败？
 
@@ -116,6 +155,25 @@ A:
 1. 检查 `.env` 文件是否正确配置
 2. 确保所有必需的环境变量都已设置
 3. 查看终端错误信息
+4. 检查 Node.js 版本：`node --version`（需要 16.x 或更高）
+
+### Q: 端口转发正常但显示 502？
+
+A:
+1. **最常见原因：Node-RED 没有启动**
+   - 在终端运行 `./start-nodered.sh` 启动 Node-RED
+   - 等待看到 "Server now running at http://127.0.0.1:1880/" 消息
+   
+2. 检查 Node-RED 是否在正确的端口运行
+   ```bash
+   # 应该看到 node-red 进程
+   ps aux | grep node-red
+   ```
+
+3. 尝试重启端口转发
+   - 在 VS Code 的 "Ports" 标签中
+   - 右键点击端口 1880
+   - 选择 "Stop Forwarding"，然后重新转发
 
 ### Q: API 调用失败？
 
@@ -128,11 +186,18 @@ A:
 
 A: 在运行 Node-RED 的终端中按 `Ctrl+C`
 
+### Q: 如何重启 Node-RED？
+
+A:
+1. 停止当前运行的 Node-RED（`Ctrl+C`）
+2. 重新运行 `./start-nodered.sh`
+
 ## 📚 更多资源
 
 - **详细配置指南**: [SETUP.md](SETUP.md)
 - **项目文档**: [README.md](README.md)
 - **Codespaces 配置**: [.devcontainer/README.md](.devcontainer/README.md)
+- **故障排除**: [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - 遇到 502 错误？看这里！
 
 ## 💡 提示
 
